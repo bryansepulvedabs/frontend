@@ -1,0 +1,156 @@
+.detail {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.detail__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.detail__back { font-size: 14px; align-self: flex-start; }
+.detail__brand { margin: 0; font-size: 14px; color: var(--muted); }
+.detail__model {
+  margin: 2px 0 0;
+  font: 800 48px/1.05 var(--font-display);
+  letter-spacing: -0.03em;
+}
+.detail__media {
+  height: 300px;
+  border-radius: 16px;
+  background: var(--sand);
+  color: #8A8373;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail__media svg { max-width: 80%; height: auto; }
+
+.detail__specs {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+.detail__specs > div {
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.detail__specs dt { font-size: 13px; color: var(--muted); }
+.detail__specs dd { margin: 4px 0 0; font-size: 16px; font-weight: 500; }
+.mono { font-family: var(--font-mono); }
+
+.detail__state {
+  padding: 48px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--muted);
+}
+
+/* Panel de reserva */
+.booking {
+  width: 400px;
+  flex-shrink: 0;
+  margin-top: 40px;
+  padding: 28px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.booking__title { margin: 0; font: 800 26px var(--font-display); letter-spacing: -0.02em; }
+.booking__rate { margin: 0; font-size: 15px; color: var(--muted); }
+.booking__rate strong { font-size: 30px; font-weight: 600; color: var(--ink); margin-right: 6px; }
+
+.booking__dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field input {
+  height: 46px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font: 14px var(--font-body);
+  color: var(--ink);
+}
+
+.booking__days {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+.stepper { display: flex; align-items: center; gap: 10px; color: var(--ink); }
+.stepper span { min-width: 64px; text-align: center; font-weight: 600; font-size: 16px; }
+.stepper button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 20px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.booking__breakdown {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.booking__breakdown .row { display: flex; justify-content: space-between; font-size: 15px; color: #3F423B; }
+.booking__breakdown .row--total { align-items: baseline; font-weight: 600; color: var(--ink); }
+.booking__total { font: 800 30px var(--font-display); letter-spacing: -0.02em; }
+
+.booking__error {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: #F5DEDA;
+  color: #8E2A20;
+  font-size: 14px;
+}
+.booking__submit { min-height: 52px; font-size: 16px; }
+.booking__submit:disabled { background: #E7E5E0; color: var(--muted); cursor: not-allowed; }
+.booking__note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+
+.booking__summary { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.booking__summary dt { font-size: 13px; color: var(--muted); }
+.booking__summary dd { margin: 2px 0 0; font-size: 15px; }
+
+.status {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.status--pendiente { background: #F6EBCF; color: #7A4F00; }
+.status--activo { background: #DDE9F4; color: #1F4E79; }
+.status--finalizado { background: #E3EEDF; color: #2A5E33; }
+.status--cancelado { background: #F5DEDA; color: #8E2A20; }
+
+@media (max-width: 900px) {
+  .detail { flex-direction: column; }
+  .booking { width: 100%; margin-top: 0; }
+  .detail__model { font-size: 36px; }
+}
