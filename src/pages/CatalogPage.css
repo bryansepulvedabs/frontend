@@ -101,6 +101,7 @@
   background: var(--surface);
   font: 12px var(--font-mono);
   color: var(--ink);
+  z-index: 1;
 }
 .car-card__body {
   flex-grow: 1;

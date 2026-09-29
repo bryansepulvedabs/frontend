@@ -1,0 +1,39 @@
+.new-rental { display: flex; flex-direction: column; gap: 16px; max-width: 480px; }
+
+.new-rental .field label { font-size: 13px; font-weight: 600; }
+.new-rental .field input,
+.new-rental .field select {
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font: 14px var(--font-body);
+  color: var(--ink);
+  width: 100%;
+}
+
+.new-rental__dates { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+.new-rental__rut-row { display: flex; gap: 8px; }
+.new-rental__rut-row input { flex-grow: 1; }
+
+.new-rental__fixed-client {
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--paper);
+}
+.new-rental__label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.new-rental__client-name { margin: 4px 0 0; font-size: 16px; font-weight: 600; }
+.new-rental__client-meta { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+
+.new-rental__found { margin: 8px 0 0; font-size: 14px; color: #2A5E33; }
+.new-rental__error { margin: 8px 0 0; font-size: 14px; color: #8E2A20; }
+.new-rental__estimate { margin: 0; font-size: 15px; }
+.new-rental__estimate strong { font-weight: 600; }

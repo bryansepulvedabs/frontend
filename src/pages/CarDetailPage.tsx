@@ -1,16 +1,14 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCarById } from '../api/cars';
+import CarPhoto from '../components/CarPhoto';
 import { createRental } from '../api/rentals';
+import { useAuth } from '../context/AuthContext';
 import type { Car } from '../types/car';
 import { CATEGORY_LABELS, FUEL_LABELS, formatCLP } from '../types/car';
 import { STATUS_LABELS } from '../types/rental';
 import './CarDetailPage.css';
-
-// TODO: reemplazar por el id del usuario autenticado cuando exista login con JWT.
-// Usa el id de un usuario que exista en el data.sql de user-service.
-const DEMO_USER_ID = 1;
 
 // ---- utilidades de fecha (strings "YYYY-MM-DD", sin problemas de zona horaria) ----
 const toISO = (d: Date) =>
@@ -63,16 +61,7 @@ export default function CarDetailPage() {
           <p className="detail__brand">{car.brand}</p>
           <h1 className="detail__model">{car.model}</h1>
         </div>
-        <div className="detail__media">
-          <svg width="320" height="150" viewBox="0 0 120 56" fill="none" stroke="currentColor"
-            strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M8 40V31c0-4 3-7 9-8l19-3 13-10c2-1 5-2 8-2h22c4 0 7 1 10 4l10 8 9 2c5 1 8 4 8 8v10" />
-            <path d="M8 40h12M44 40h34M102 40h10" />
-            <circle cx="32" cy="40" r="10" />
-            <circle cx="90" cy="40" r="10" />
-            <path d="M42 20l10-9h14v9zM72 20v-9h12l10 9z" />
-          </svg>
-        </div>
+        <CarPhoto car={car} size="hero" />
         <dl className="detail__specs">
           <div><dt>Patente</dt><dd className="mono">{car.licensePlate}</dd></div>
           <div><dt>Categoría</dt><dd>{CATEGORY_LABELS[car.category]}</dd></div>
@@ -80,7 +69,7 @@ export default function CarDetailPage() {
           <div><dt>Año</dt><dd>{car.year}</dd></div>
           <div><dt>Asientos</dt><dd>{car.seats}</dd></div>
           <div><dt>Color</dt><dd>{car.color}</dd></div>
-          <div><dt>Kilometraje</dt><dd>{car.mileage.toLocaleString('es-CL')} km</dd></div>
+          <div><dt>Kilometraje</dt><dd>{car.mileage != null ? `${car.mileage.toLocaleString('es-CL')} km` : '—'}</dd></div>
         </dl>
       </div>
 
@@ -90,6 +79,8 @@ export default function CarDetailPage() {
 }
 
 function BookingPanel({ car }: { car: Car }) {
+  const { user } = useAuth();
+  const location = useLocation();
   const today = toISO(new Date());
   const [startDate, setStartDate] = useState(addDays(today, 1));
   const [endDate, setEndDate] = useState(addDays(today, 4));
@@ -103,6 +94,21 @@ function BookingPanel({ car }: { car: Car }) {
       queryClient.invalidateQueries({ queryKey: ['car', car.id] });
     },
   });
+
+  // Sin sesión no hay a nombre de quién crear el arriendo
+  if (!user) {
+    return (
+      <aside className="booking">
+        <h2 className="booking__title">Inicia sesión para arrendar</h2>
+        <p className="booking__note">
+          Necesitas una cuenta para reservar este auto y después verlo en “Mis arriendos”.
+        </p>
+        <Link to="/login" state={{ from: location.pathname }} className="btn-primary">
+          Iniciar sesión
+        </Link>
+      </aside>
+    );
+  }
 
   // Confirmación: se muestra con los datos que devolvió rental-service
   if (mutation.isSuccess) {
@@ -147,7 +153,7 @@ function BookingPanel({ car }: { car: Car }) {
 
   const submit = () => {
     if (datesError) return;
-    mutation.mutate({ carId: car.id, userId: DEMO_USER_ID, startDate, endDate });
+    mutation.mutate({ carId: car.id, userId: user.id, startDate, endDate });
   };
 
   return (

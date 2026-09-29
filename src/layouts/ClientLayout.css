@@ -40,3 +40,26 @@
   .client-header { padding: 0 20px; gap: 20px; }
   .client-main { padding: 28px 20px 48px; }
 }
+
+.client-footer {
+  padding: 24px 48px 32px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.client-session { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+.client-session__link {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+}
+.client-session__logout {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}

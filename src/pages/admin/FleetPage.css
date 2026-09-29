@@ -1,0 +1,88 @@
+.fleet { display: flex; flex-direction: column; gap: 24px; }
+.fleet__intro h1 { margin: 0 0 6px; font: 800 38px var(--font-display); letter-spacing: -0.03em; }
+.fleet__intro p { margin: 0; font-size: 15px; color: var(--muted); }
+
+.fleet__layout { display: flex; gap: 28px; align-items: flex-start; }
+.fleet__table-wrap {
+  flex-grow: 1;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.fleet__table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.fleet__table th {
+  text-align: left;
+  padding: 12px 20px;
+  background: #F7F4ED;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.fleet__table td { padding: 12px 20px; border-bottom: 1px solid #EDE8DE; vertical-align: middle; }
+.fleet__car-model { margin: 0; font-weight: 600; }
+.fleet__car-brand { margin: 0; font-size: 12px; color: var(--muted); }
+.fleet__rate { font-weight: 600; }
+
+.fleet__switch-cell { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+.switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--line-strong);
+  cursor: pointer;
+}
+.switch--on { background: #2F6B3A; }
+.switch__knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  transition: left 0.15s ease;
+}
+.switch--on .switch__knob { left: 23px; }
+
+.fleet__delete { border: none; background: none; color: #8E2A20; font: 14px var(--font-body); cursor: pointer; }
+
+.fleet__state { padding: 20px; color: var(--muted); }
+.fleet__state--error { color: #8E2A20; }
+
+.fleet__form-card {
+  width: 320px;
+  flex-shrink: 0;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.fleet__form-card h2 { margin: 0 0 4px; font: 800 22px var(--font-display); }
+.fleet__form { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+.fleet__form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.fleet__form .field label { font-size: 13px; font-weight: 600; }
+.fleet__form .field input,
+.fleet__form .field select {
+  height: 44px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font: 14px var(--font-body);
+  color: var(--ink);
+  width: 100%;
+}
+
+@media (max-width: 1100px) {
+  .fleet__layout { flex-direction: column; }
+  .fleet__form-card { width: 100%; }
+}

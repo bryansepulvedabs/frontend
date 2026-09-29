@@ -55,3 +55,71 @@ a:hover { color: var(--accent-hover); }
   cursor: pointer;
 }
 .btn-primary:hover { background: var(--accent-hover); color: #FFFFFF; }
+
+/* Foto del auto (CarPhoto) */
+.car-photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--sand);
+  color: #8A8373;
+}
+.car-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.car-photo--card svg { width: 150px; }
+.car-photo--hero { height: 340px; border-radius: 16px; }
+.car-photo--hero svg { width: 320px; max-width: 80%; }
+.car-photo__credit {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  max-width: calc(100% - 16px);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(27, 29, 24, 0.78);
+  color: #FFFFFF;
+  font-size: 11px;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.car-photo__credit:hover { color: #FFFFFF; text-decoration: underline; }
+
+/* Botones secundarios usados en el backoffice */
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: var(--paper);
+  font: 600 13px var(--font-body);
+  cursor: pointer;
+}
+.btn-dark:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-outline-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: #8E2A20;
+  font: 500 13px var(--font-body);
+  cursor: pointer;
+}
+.btn-outline-danger:disabled { opacity: 0.5; cursor: not-allowed; }

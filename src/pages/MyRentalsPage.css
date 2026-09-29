@@ -1,0 +1,39 @@
+.my-rentals { display: flex; flex-direction: column; gap: 24px; }
+.my-rentals__intro h1 { margin: 0 0 6px; font: 800 44px var(--font-display); letter-spacing: -0.03em; }
+.my-rentals__intro p { margin: 0; font-size: 16px; color: var(--muted); }
+
+.my-rentals__state { padding: 20px; color: var(--muted); }
+.my-rentals__state--error { color: #8E2A20; }
+
+.my-rentals__empty {
+  padding: 48px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: var(--muted);
+}
+
+.my-rentals__list { display: flex; flex-direction: column; gap: 14px; }
+.my-rentals__card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: grid;
+  grid-template-columns: 2fr 1.4fr 140px 130px 110px;
+  gap: 20px;
+  align-items: center;
+}
+.my-rentals__actions { display: flex; justify-content: flex-end; }
+.my-rentals__car { margin: 0; font-size: 18px; font-weight: 600; }
+.my-rentals__meta { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.my-rentals__dates { font-size: 15px; }
+.my-rentals__total { font-size: 18px; font-weight: 600; }
+
+@media (max-width: 800px) {
+  .my-rentals__card { grid-template-columns: 1fr; gap: 8px; }
+}

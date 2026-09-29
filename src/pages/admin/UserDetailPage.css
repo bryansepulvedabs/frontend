@@ -1,0 +1,128 @@
+.user-detail { display: flex; flex-direction: column; gap: 24px; }
+
+/* ---- Volver ---- */
+.user-detail__back {
+  align-self: flex-start;
+  font-size: 14px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.user-detail__back:hover { color: var(--accent); text-decoration: underline; }
+
+/* ---- Encabezado ---- */
+.user-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.user-detail__identity { display: flex; align-items: center; gap: 16px; }
+.user-detail__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #E0D6C3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 600 18px var(--font-body);
+  flex-shrink: 0;
+}
+.user-detail__header h1 { margin: 0 0 6px; font: 800 38px var(--font-display); letter-spacing: -0.03em; }
+.user-detail__role {
+  display: inline-block;
+  margin: 0;
+  padding: 3px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.user-detail__role:empty { display: none; }
+
+/* ---- Tarjetas ---- */
+.user-detail__card {
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.user-detail__card h2 { margin: 0 0 18px; font: 800 22px var(--font-display); }
+.user-detail__card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.user-detail__card-head h2 { margin: 0; }
+.user-detail__summary { margin: 0; font-size: 14px; color: var(--muted); }
+
+/* ---- Datos de contacto ---- */
+.user-detail__data {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px 24px;
+  margin: 0;
+}
+.user-detail__data > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.user-detail__data dt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.user-detail__data dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* ---- Historial ---- */
+.user-detail__table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.user-detail__table th {
+  text-align: left;
+  padding: 10px 16px 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.user-detail__table td {
+  padding: 14px 16px 14px 0;
+  border-bottom: 1px solid #EDE8DE;
+  vertical-align: middle;
+}
+.user-detail__table th:last-child,
+.user-detail__table td:last-child { padding-right: 0; }
+.user-detail__table tbody tr:last-child td { border-bottom: none; }
+
+/* Nº angosto, Total a la derecha */
+.user-detail__table th:first-child,
+.user-detail__table td:first-child { width: 1%; white-space: nowrap; color: var(--muted); }
+.user-detail__table th:nth-child(4),
+.user-detail__table td:nth-child(4) { text-align: right; white-space: nowrap; }
+.user-detail__table th:nth-child(3),
+.user-detail__table td:nth-child(3) { white-space: nowrap; }
+
+.user-detail__primary { margin: 0; font-weight: 600; }
+.user-detail__secondary { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+/* ---- Estados ---- */
+.user-detail__state { padding: 20px 0; color: var(--muted); }
+.user-detail__state--error { color: #8E2A20; }
+
+@media (max-width: 720px) {
+  .user-detail__header h1 { font-size: 30px; }
+  .user-detail__card { padding: 18px; }
+}

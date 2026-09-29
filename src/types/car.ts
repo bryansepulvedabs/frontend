@@ -1,3 +1,6 @@
+// Refleja rent_a_car_bryan.carservice.dto.CarResponseDTO
+// Los enums se modelan como uniones de strings porque Spring los serializa por nombre.
+
 export type Category =
   | 'SEDAN'
   | 'SUV'
@@ -22,6 +25,11 @@ export interface Car {
   mileage: number;
   availability: boolean;
   dailyRate: number; // Long en CLP
+  // Imagen de Pexels (null si aún no tiene)
+  imageUrl: string | null;
+  imagePhotographer: string | null;
+  imagePhotographerUrl: string | null;
+  imageSourceUrl: string | null;
 }
 
 export const CATEGORY_LABELS: Record<Category, string> = {

@@ -1,27 +1,40 @@
-import type { RentalRequest, RentalResponse } from '../types/rental';
+import type { RentalRequest, RentalResponse, RentalState } from '../types/rental';
+import { authFetch, parseJsonOrThrow } from './http';
 
 const BASE = '/api/rentals';
 
-// Intenta leer el mensaje de la excepción (InvalidRentalException, etc.).
-// Spring solo incluye "message" en el cuerpo si está habilitado o si hay un @ControllerAdvice.
-async function toError(res: Response, fallback: string): Promise<Error> {
-  let detail = '';
-  try {
-    const body = await res.json();
-    detail = body.message || body.error || '';
-  } catch {
-    // cuerpo vacío o no JSON: se usa el mensaje genérico
-  }
-  return new Error(detail || `${fallback} (HTTP ${res.status})`);
-}
-
-// POST /api/rentals
+// POST /api/rentals — público (el cliente aún no inicia sesión para arrendar)
 export async function createRental(dto: RentalRequest): Promise<RentalResponse> {
-  const res = await fetch(BASE, {
+  const res = await authFetch(BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(dto),
   });
-  if (!res.ok) throw await toError(res, 'No se pudo crear el arriendo');
-  return res.json() as Promise<RentalResponse>;
+  return parseJsonOrThrow<RentalResponse>(res, 'No se pudo crear el arriendo');
+}
+
+// GET /api/rentals — listado para el backoffice
+export async function getAllRentals(): Promise<RentalResponse[]> {
+  const res = await authFetch(BASE);
+  return parseJsonOrThrow<RentalResponse[]>(res, 'la lista de arriendos');
+}
+
+// GET /api/rentals/user/{userId} — arriendos del cliente logueado, para "Mis arriendos"
+export async function getRentalsByUserId(userId: number): Promise<RentalResponse[]> {
+  const res = await authFetch(`${BASE}/user/${userId}`);
+  return parseJsonOrThrow<RentalResponse[]>(res, 'tus arriendos');
+}
+
+// PATCH /api/rentals/{id}/status?newStatus=... — requiere ADMIN o EMPLOYEE
+export async function updateRentalStatus(id: number, newStatus: RentalState): Promise<RentalResponse> {
+  const res = await authFetch(`${BASE}/${id}/status?newStatus=${newStatus}`, {
+    method: 'PATCH',
+  });
+  return parseJsonOrThrow<RentalResponse>(res, 'No se pudo actualizar el estado del arriendo');
+}
+
+// DELETE /api/rentals/{id} — requiere ADMIN o EMPLOYEE
+export async function deleteRental(id: number): Promise<void> {
+  const res = await authFetch(`${BASE}/${id}`, { method: 'DELETE' });
+  await parseJsonOrThrow<void>(res, 'No se pudo eliminar el arriendo');
 }

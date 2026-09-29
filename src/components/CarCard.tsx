@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import CarPhoto from './CarPhoto';
 import type { Car } from '../types/car';
 import { CATEGORY_LABELS, FUEL_LABELS, formatCLP } from '../types/car';
 
@@ -10,7 +11,7 @@ export default function CarCard({ car }: Props) {
   return (
     <article className="car-card">
       <div className="car-card__media">
-        <CarSilhouette />
+        <CarPhoto car={car} size="card" />
         <span className="car-card__plate">{car.licensePlate}</span>
       </div>
 
@@ -47,18 +48,5 @@ export default function CarCard({ car }: Props) {
         </div>
       </div>
     </article>
-  );
-}
-
-function CarSilhouette() {
-  return (
-    <svg width="150" height="70" viewBox="0 0 120 56" fill="none" stroke="currentColor"
-      strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M8 40V31c0-4 3-7 9-8l19-3 13-10c2-1 5-2 8-2h22c4 0 7 1 10 4l10 8 9 2c5 1 8 4 8 8v10" />
-      <path d="M8 40h12M44 40h34M102 40h10" />
-      <circle cx="32" cy="40" r="10" />
-      <circle cx="90" cy="40" r="10" />
-      <path d="M42 20l10-9h14v9zM72 20v-9h12l10 9z" />
-    </svg>
   );
 }
