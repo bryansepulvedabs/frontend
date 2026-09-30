@@ -1,34 +1,15 @@
 import { useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCarById } from '../api/cars';
 import CarPhoto from '../components/CarPhoto';
-import { createRental } from '../api/rentals';
+import { createRental, isCarAvailable } from '../api/rentals';
 import { useAuth } from '../context/AuthContext';
 import type { Car } from '../types/car';
 import { CATEGORY_LABELS, FUEL_LABELS, formatCLP } from '../types/car';
 import { STATUS_LABELS } from '../types/rental';
+import { addDays, daysBetween, formatDate, isISODate, todayISO } from '../utils/dates';
 import './CarDetailPage.css';
-
-// ---- utilidades de fecha (strings "YYYY-MM-DD", sin problemas de zona horaria) ----
-const toISO = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-const addDays = (iso: string, n: number) => {
-  const [y, m, d] = iso.split('-').map(Number);
-  return toISO(new Date(y, m - 1, d + n));
-};
-
-const daysBetween = (start: string, end: string) => {
-  const [y1, m1, d1] = start.split('-').map(Number);
-  const [y2, m2, d2] = end.split('-').map(Number);
-  return Math.round((Date.UTC(y2, m2 - 1, d2) - Date.UTC(y1, m1 - 1, d1)) / 86_400_000);
-};
-
-const formatDate = (iso: string) => {
-  const [y, m, d] = iso.split('-').map(Number);
-  return new Date(y, m - 1, d).toLocaleDateString('es-CL', { day: 'numeric', month: 'short', year: 'numeric' });
-};
 
 export default function CarDetailPage() {
   const { id } = useParams();
@@ -81,21 +62,54 @@ export default function CarDetailPage() {
 function BookingPanel({ car }: { car: Car }) {
   const { user } = useAuth();
   const location = useLocation();
-  const today = toISO(new Date());
-  const [startDate, setStartDate] = useState(addDays(today, 1));
-  const [endDate, setEndDate] = useState(addDays(today, 4));
+  const [searchParams] = useSearchParams();
+  const today = todayISO();
+
+  // Si se llegó desde el catálogo con fechas elegidas, se respetan; si no, un rango por defecto.
+  const [startDate, setStartDate] = useState(() => {
+    const fromUrl = searchParams.get('startDate');
+    return isISODate(fromUrl) && fromUrl >= today ? fromUrl : addDays(today, 1);
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const fromUrl = searchParams.get('endDate');
+    const start = searchParams.get('startDate');
+    const effectiveStart = isISODate(start) && start >= today ? start : addDays(today, 1);
+    return isISODate(fromUrl) && daysBetween(effectiveStart, fromUrl) >= 1
+      ? fromUrl
+      : addDays(effectiveStart, 3);
+  });
+
+  const days = daysBetween(startDate, endDate);
+  const datesError =
+    startDate < today
+      ? 'La fecha de retiro no puede ser anterior a hoy.'
+      : days < 1
+        ? 'La fecha de devolución debe ser posterior a la de retiro.'
+        : null;
+
+  // La disponibilidad ya no es un flag del auto: depende del periodo pedido. Se consulta
+  // cada vez que cambian las fechas, para avisar antes de enviar y no después con un 400.
+  // Ojo: todos los hooks van antes de los early returns de abajo.
+  const availabilityQuery = useQuery({
+    queryKey: ['car-availability', car.id, startDate, endDate],
+    queryFn: () => isCarAvailable(car.id, startDate, endDate),
+    enabled: !datesError && car.availability,
+    staleTime: 0,
+  });
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: createRental,
     onSuccess: () => {
-      // la disponibilidad del auto cambió en car-service
-      queryClient.invalidateQueries({ queryKey: ['cars'] });
-      queryClient.invalidateQueries({ queryKey: ['car', car.id] });
+      // el auto queda ocupado en ese periodo: se invalidan las consultas de disponibilidad
+      queryClient.invalidateQueries({ queryKey: ['car-availability'] });
+      queryClient.invalidateQueries({ queryKey: ['occupied-cars'] });
+      queryClient.invalidateQueries({ queryKey: ['rentals'] });
     },
   });
 
-  // Sin sesión no hay a nombre de quién crear el arriendo
+  // Sin sesión no hay a nombre de quién crear el arriendo.
+  // Se guarda tambien el querystring para no perder las fechas al volver del login.
   if (!user) {
     return (
       <aside className="booking">
@@ -103,7 +117,7 @@ function BookingPanel({ car }: { car: Car }) {
         <p className="booking__note">
           Necesitas una cuenta para reservar este auto y después verlo en “Mis arriendos”.
         </p>
-        <Link to="/login" state={{ from: location.pathname }} className="btn-primary">
+        <Link to="/login" state={{ from: location.pathname + location.search }} className="btn-primary">
           Iniciar sesión
         </Link>
       </aside>
@@ -128,23 +142,21 @@ function BookingPanel({ car }: { car: Car }) {
     );
   }
 
+  // availability = false ya no significa "arrendado", sino fuera de servicio
   if (!car.availability) {
     return (
       <aside className="booking">
-        <h2 className="booking__title">No disponible</h2>
-        <p className="booking__note">Este auto está arrendado. Elige otro desde el catálogo.</p>
+        <h2 className="booking__title">Fuera de servicio</h2>
+        <p className="booking__note">
+          Este auto está en mantención y no se puede reservar por ahora. Elige otro desde el catálogo.
+        </p>
         <Link to="/" className="btn-primary">Ver otros autos</Link>
       </aside>
     );
   }
 
-  const days = daysBetween(startDate, endDate);
-  const datesError =
-    startDate < today
-      ? 'La fecha de retiro no puede ser anterior a hoy.'
-      : days < 1
-        ? 'La fecha de devolución debe ser posterior a la de retiro.'
-        : null;
+  const checkingAvailability = !datesError && availabilityQuery.isPending;
+  const occupied = availabilityQuery.data === false;
 
   const shiftEnd = (n: number) => {
     const next = addDays(endDate, n);
@@ -152,7 +164,7 @@ function BookingPanel({ car }: { car: Car }) {
   };
 
   const submit = () => {
-    if (datesError) return;
+    if (datesError || occupied || checkingAvailability) return;
     mutation.mutate({ carId: car.id, userId: user.id, startDate, endDate });
   };
 
@@ -186,6 +198,25 @@ function BookingPanel({ car }: { car: Car }) {
 
       {datesError && <p className="booking__error" role="alert">{datesError}</p>}
 
+      {!datesError && checkingAvailability && (
+        <p className="booking__note">Comprobando disponibilidad…</p>
+      )}
+      {!datesError && occupied && (
+        <p className="booking__error" role="alert">
+          El auto ya está arrendado entre esas fechas. Prueba con otro periodo.
+        </p>
+      )}
+      {!datesError && availabilityQuery.data === true && (
+        <p className="booking__note" aria-live="polite">
+          Disponible del {formatDate(startDate)} al {formatDate(endDate)}.
+        </p>
+      )}
+      {!datesError && availabilityQuery.isError && (
+        <p className="booking__note">
+          No se pudo comprobar la disponibilidad. Puedes intentar reservar igual.
+        </p>
+      )}
+
       <div className="booking__breakdown">
         <div className="row">
           <span>{days >= 1 ? `${formatCLP(car.dailyRate)} × ${days} ${days === 1 ? 'día' : 'días'}` : 'Revisa las fechas'}</span>
@@ -202,11 +233,17 @@ function BookingPanel({ car }: { car: Car }) {
       )}
 
       <button type="button" className="btn-primary booking__submit"
-        disabled={!!datesError || mutation.isPending} onClick={submit}>
-        {mutation.isPending ? 'Creando arriendo…' : 'Confirmar arriendo'}
+        disabled={!!datesError || occupied || checkingAvailability || mutation.isPending}
+        onClick={submit}>
+        {mutation.isPending
+          ? 'Creando arriendo…'
+          : checkingAvailability
+            ? 'Comprobando…'
+            : 'Confirmar arriendo'}
       </button>
       <p className="booking__note">
-        Al confirmar, el auto queda como no disponible hasta que el arriendo se finalice o cancele.
+        El auto queda reservado solo en las fechas que elijas; el resto del tiempo sigue disponible
+        para otros arriendos.
       </p>
     </aside>
   );
