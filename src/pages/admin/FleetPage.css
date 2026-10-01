@@ -86,3 +86,41 @@
   .fleet__layout { flex-direction: column; }
   .fleet__form-card { width: 100%; }
 }
+
+.fleet__car-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.fleet__car-link:hover .fleet__car-model { color: var(--accent); }
+
+.fleet__tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.fleet__tab {
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: 500 14px var(--font-body);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.fleet__tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  font-weight: 600;
+}
+.fleet__car-model--muted { color: var(--muted); }
+.fleet__restore {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: 600 14px var(--font-body);
+  cursor: pointer;
+}
+.fleet__restore:disabled { opacity: 0.5; cursor: not-allowed; }

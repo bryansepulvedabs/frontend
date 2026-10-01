@@ -33,6 +33,8 @@ export interface RentalResponse {
   endDate: string;
   status: RentalState;
   totalPrice: number;
+  // true si el arriendo está dado de baja (solo lo devuelve el endpoint de admin)
+  deleted?: boolean;
 }
 
 export const STATUS_LABELS: Record<RentalState, string> = {

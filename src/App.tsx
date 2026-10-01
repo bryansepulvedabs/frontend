@@ -6,10 +6,13 @@ import CatalogPage from './pages/CatalogPage';
 import CarDetailPage from './pages/CarDetailPage';
 import MyRentalsPage from './pages/MyRentalsPage';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import FleetPage from './pages/admin/FleetPage';
+import CarDetailAdminPage from './pages/admin/CarDetailAdminPage';
 import UsersPage from './pages/admin/UsersPage';
 import UserDetailPage from './pages/admin/UserDetailPage';
 import RentalsOpsPage from './pages/admin/RentalsOpsPage';
+import RentalDetailPage from './pages/admin/RentalDetailPage';
 
 export default function App() {
   return (
@@ -29,6 +32,7 @@ export default function App() {
         </Route>
 
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegisterPage />} />
 
         <Route
           path="/admin"
@@ -38,12 +42,23 @@ export default function App() {
             </ProtectedRoute>
           }
         >
+          {/* Arriendos: la lista y la ficha las pueden abrir ADMIN y EMPLOYEE */}
           <Route path="arriendos" element={<RentalsOpsPage />} />
+          <Route path="arriendos/:id" element={<RentalDetailPage />} />
+
           <Route
             path="flota"
             element={
               <ProtectedRoute allow={['ADMIN']} redirectTo="/admin/arriendos">
                 <FleetPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="flota/:id"
+            element={
+              <ProtectedRoute allow={['ADMIN']} redirectTo="/admin/arriendos">
+                <CarDetailAdminPage />
               </ProtectedRoute>
             }
           />

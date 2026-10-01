@@ -54,3 +54,43 @@
 .users__actions { display: flex; justify-content: flex-end; align-items: center; gap: 14px; }
 .users__detail-link { font-size: 14px; text-decoration: none; }
 .users__detail-link:hover { text-decoration: underline; }
+
+/* --- Agregar al final de UsersPage.css --- */
+
+.users__tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.users__tab {
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: 500 14px var(--font-body);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.users__tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+  font-weight: 600;
+}
+
+.users__name-link--muted {
+  color: var(--muted);
+  cursor: default;
+  text-decoration: none;
+}
+
+.users__restore {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: 14px var(--font-body);
+  cursor: pointer;
+  font-weight: 600;
+}
+.users__restore:disabled { opacity: 0.5; cursor: not-allowed; }

@@ -12,6 +12,8 @@ export interface User {
   city: string;
   country: string;
   role: Role;
+  // true si el usuario está dado de baja (solo lo devuelve el endpoint de admin)
+  deleted?: boolean;
 }
 
 // Coincide con UserRequestDTO. password es opcional al editar: si se omite, no cambia.

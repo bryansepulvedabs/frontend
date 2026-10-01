@@ -126,3 +126,19 @@
   .user-detail__header h1 { font-size: 30px; }
   .user-detail__card { padding: 18px; }
 }
+
+.user-detail__link { color: var(--ink); text-decoration: none; font-weight: 600; }
+.user-detail__link:hover { color: var(--accent); text-decoration: underline; }
+
+.user-detail__banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  background: #F5EFE2;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+}
+.user-detail__banner p { margin: 0; font-size: 14px; color: var(--ink); }

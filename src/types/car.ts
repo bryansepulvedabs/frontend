@@ -23,6 +23,8 @@ export interface Car {
   fuel: Fuel;
   seats: number;
   mileage: number;
+  // "operativo / fuera de servicio" (mantención). Estar arrendado en unas fechas
+  // lo resuelve rental-service, no este campo.
   availability: boolean;
   dailyRate: number; // Long en CLP
   // Imagen de Pexels (null si aún no tiene)
@@ -30,6 +32,8 @@ export interface Car {
   imagePhotographer: string | null;
   imagePhotographerUrl: string | null;
   imageSourceUrl: string | null;
+  // true si el auto está dado de baja (solo lo devuelve el endpoint de admin)
+  deleted?: boolean;
 }
 
 export const CATEGORY_LABELS: Record<Category, string> = {

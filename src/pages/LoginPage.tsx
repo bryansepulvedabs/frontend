@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { login as loginRequest } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
@@ -99,6 +99,10 @@ export default function LoginPage() {
           <button type="submit" className="btn-primary login__submit" disabled={mutation.isPending}>
             {mutation.isPending ? 'Ingresando…' : 'Ingresar'}
           </button>
+
+          <p className="login__foot">
+            ¿No tienes cuenta? <Link to="/registro">Crea una</Link>
+          </p>
         </form>
       </section>
     </div>

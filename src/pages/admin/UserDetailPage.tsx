@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { getUser } from '../../api/users';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { getUserAdmin, restoreUser } from '../../api/users';
 import { getRentalsByUserId } from '../../api/rentals';
 import NewRentalForm from '../../components/NewRentalForm';
 import { formatCLP } from '../../types/car';
@@ -30,9 +30,10 @@ export default function UserDetailPage() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
 
+  // Endpoint de admin: devuelve al usuario aunque esté eliminado (deleted = true)
   const { data: user, isPending, isError, error } = useQuery({
     queryKey: ['user', userId],
-    queryFn: () => getUser(userId),
+    queryFn: () => getUserAdmin(userId),
     enabled: Number.isFinite(userId),
   });
 
@@ -40,6 +41,14 @@ export default function UserDetailPage() {
     queryKey: ['rentals', 'user', userId],
     queryFn: () => getRentalsByUserId(userId),
     enabled: Number.isFinite(userId),
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: () => restoreUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['user', userId] });
+    },
   });
 
   if (!Number.isFinite(userId)) {
@@ -55,6 +64,7 @@ export default function UserDetailPage() {
     );
   }
 
+  const isDeleted = user.deleted === true;
   const rentals = rentalsQuery.data ?? [];
   const totalSpent = rentals
     .filter((r) => r.status === 'FINALIZADO' || r.status === 'ACTIVO')
@@ -74,19 +84,48 @@ export default function UserDetailPage() {
             <p className="user-detail__role">{ROLE_LABELS[user.role]}</p>
           </div>
         </div>
-        <button type="button" className="btn-primary" onClick={() => setShowForm((v) => !v)}>
-          {showForm ? 'Cerrar' : 'Nuevo arriendo'}
-        </button>
+        {!isDeleted && (
+          <button type="button" className="btn-primary" onClick={() => setShowForm((v) => !v)}>
+            {showForm ? 'Cerrar' : 'Nuevo arriendo'}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {isDeleted && (
+        <div className="user-detail__banner" role="status">
+          <p>
+            <strong>Usuario eliminado.</strong> No puede iniciar sesión ni aparece en el listado,
+            pero su historial se conserva.
+          </p>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={restoreMutation.isPending}
+            onClick={() => {
+              if (confirm(`¿Reactivar a ${user.firstName} ${user.lastName}?`)) {
+                restoreMutation.mutate();
+              }
+            }}
+          >
+            {restoreMutation.isPending ? 'Reactivando…' : 'Reactivar'}
+          </button>
+        </div>
+      )}
+
+      {restoreMutation.isError && (
+        <p className="user-detail__state user-detail__state--error" role="alert">
+          {restoreMutation.error.message}
+        </p>
+      )}
+
+      {showForm && !isDeleted && (
         <div className="user-detail__card">
           <h2>Nuevo arriendo para {user.firstName}</h2>
           <NewRentalForm
             client={user}
             onCreated={() => {
               queryClient.invalidateQueries({ queryKey: ['rentals'] });
-              queryClient.invalidateQueries({ queryKey: ['cars'] });
+              queryClient.invalidateQueries({ queryKey: ['occupied-cars'] });
               setShowForm(false);
             }}
           />
@@ -137,9 +176,15 @@ export default function UserDetailPage() {
             <tbody>
               {rentals.map((r) => (
                 <tr key={r.id}>
-                  <td className="mono">#{r.id}</td>
+                  <td className="mono">
+                    <Link to={`/admin/arriendos/${r.id}`} className="user-detail__link">#{r.id}</Link>
+                  </td>
                   <td>
-                    <p className="user-detail__primary">{r.car.brand} {r.car.model}</p>
+                    <p className="user-detail__primary">
+                      <Link to={`/admin/flota/${r.car.id}`} className="user-detail__link">
+                        {r.car.brand} {r.car.model}
+                      </Link>
+                    </p>
                     <p className="user-detail__secondary mono">{r.car.licensePlate}</p>
                   </td>
                   <td>{formatDate(r.startDate)} → {formatDate(r.endDate)}</td>

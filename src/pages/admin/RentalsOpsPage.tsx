@@ -1,6 +1,13 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { deleteRental, getAllRentals, updateRentalStatus } from '../../api/rentals';
+import {
+  deleteRental,
+  getAllRentals,
+  getDeletedRentals,
+  restoreRental,
+  updateRentalStatus,
+} from '../../api/rentals';
 import NewRentalForm from '../../components/NewRentalForm';
 import type { RentalState } from '../../types/rental';
 import { STATUS_LABELS } from '../../types/rental';
@@ -8,6 +15,7 @@ import { formatCLP } from '../../types/car';
 import './RentalsOpsPage.css';
 
 type StatusFilter = RentalState | 'TODOS';
+type Tab = 'active' | 'deleted';
 
 const STATUS_CLASS: Record<RentalState, string> = {
   PENDIENTE: 'status--pendiente',
@@ -23,17 +31,24 @@ const formatDate = (iso: string) => {
 
 export default function RentalsOpsPage() {
   const queryClient = useQueryClient();
-  const { data: rentals = [], isPending, isError, error } = useQuery({
-    queryKey: ['rentals'],
-    queryFn: getAllRentals,
+  const [tab, setTab] = useState<Tab>('active');
+
+  const activeQuery = useQuery({ queryKey: ['rentals'], queryFn: getAllRentals });
+
+  const deletedQuery = useQuery({
+    queryKey: ['rentals', 'deleted'],
+    queryFn: getDeletedRentals,
+    enabled: tab === 'deleted',
   });
+
   const [filter, setFilter] = useState<StatusFilter>('TODOS');
   const [showForm, setShowForm] = useState(false);
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['rentals'] });
-    // crear/finalizar/cancelar cambia la disponibilidad del auto en car-service
-    queryClient.invalidateQueries({ queryKey: ['cars'] });
+    queryClient.invalidateQueries({ queryKey: ['rental'] });
+    queryClient.invalidateQueries({ queryKey: ['occupied-cars'] });
+    queryClient.invalidateQueries({ queryKey: ['car-availability'] });
   };
 
   const statusMutation = useMutation({
@@ -46,17 +61,31 @@ export default function RentalsOpsPage() {
     onSuccess: invalidate,
   });
 
+  const restoreMutation = useMutation({
+    mutationFn: restoreRental,
+    onSuccess: invalidate,
+  });
+
+  const query = tab === 'active' ? activeQuery : deletedQuery;
+  const rentals = query.data ?? [];
   const filtered = rentals.filter((r) => filter === 'TODOS' || r.status === filter);
 
-  const count = (s: RentalState) => rentals.filter((r) => r.status === s).length;
-  const revenue = rentals.filter((r) => r.status === 'FINALIZADO').reduce((a, r) => a + r.totalPrice, 0);
+  const activeRentals = activeQuery.data ?? [];
+  const count = (s: RentalState) => activeRentals.filter((r) => r.status === s).length;
+  const revenue = activeRentals
+    .filter((r) => r.status === 'FINALIZADO')
+    .reduce((a, r) => a + r.totalPrice, 0);
+
+  const busy = statusMutation.isPending || deleteMutation.isPending || restoreMutation.isPending;
+  const actionError =
+    statusMutation.error?.message ?? deleteMutation.error?.message ?? restoreMutation.error?.message ?? null;
 
   return (
     <section className="rentals-ops">
       <div className="rentals-ops__intro">
         <div>
           <h1>Arriendos</h1>
-          <p>Finaliza o cancela arriendos; la disponibilidad del auto se actualiza sola.</p>
+          <p>Reservas, arriendos activos e historial. El auto queda ocupado solo en las fechas del arriendo.</p>
         </div>
         <button type="button" className="btn-primary" onClick={() => setShowForm((v) => !v)}>
           {showForm ? 'Cerrar' : 'Nuevo arriendo'}
@@ -76,7 +105,7 @@ export default function RentalsOpsPage() {
         </div>
       )}
 
-      {!isPending && !isError && (
+      {tab === 'active' && !activeQuery.isPending && !activeQuery.isError && (
         <div className="rentals-ops__kpis">
           <div className="kpi"><span>Activos</span><strong>{count('ACTIVO')}</strong></div>
           <div className="kpi"><span>Pendientes</span><strong>{count('PENDIENTE')}</strong></div>
@@ -84,6 +113,17 @@ export default function RentalsOpsPage() {
           <div className="kpi"><span>Facturado finalizados</span><strong>{formatCLP(revenue)}</strong></div>
         </div>
       )}
+
+      <div className="rentals-ops__tabs" role="tablist" aria-label="Estado de los arriendos">
+        <button type="button" role="tab" className="rentals-ops__tab"
+          aria-selected={tab === 'active'} onClick={() => setTab('active')}>
+          Vigentes
+        </button>
+        <button type="button" role="tab" className="rentals-ops__tab"
+          aria-selected={tab === 'deleted'} onClick={() => setTab('deleted')}>
+          Eliminados
+        </button>
+      </div>
 
       <div className="pills" role="group" aria-label="Filtrar por estado">
         <button type="button" className="pill" aria-pressed={filter === 'TODOS'} onClick={() => setFilter('TODOS')}>
@@ -96,10 +136,22 @@ export default function RentalsOpsPage() {
         ))}
       </div>
 
-      {isPending && <p className="rentals-ops__state">Cargando arriendos…</p>}
-      {isError && <p className="rentals-ops__state rentals-ops__state--error">{error.message}</p>}
+      {actionError && (
+        <p className="rentals-ops__state rentals-ops__state--error" role="alert">{actionError}</p>
+      )}
 
-      {!isPending && !isError && (
+      {query.isPending && <p className="rentals-ops__state">Cargando arriendos…</p>}
+      {query.isError && <p className="rentals-ops__state rentals-ops__state--error">{query.error.message}</p>}
+
+      {!query.isPending && !query.isError && filtered.length === 0 && (
+        <p className="rentals-ops__state">
+          {tab === 'active'
+            ? 'No hay arriendos que coincidan con este filtro.'
+            : 'No hay arriendos eliminados.'}
+        </p>
+      )}
+
+      {!query.isPending && !query.isError && filtered.length > 0 && (
         <div className="rentals-ops__table-wrap">
           <table className="rentals-ops__table">
             <thead>
@@ -114,47 +166,68 @@ export default function RentalsOpsPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((r) => {
-                const busy = statusMutation.isPending || deleteMutation.isPending;
-                return (
-                  <tr key={r.id}>
-                    <td className="mono">#{r.id}</td>
-                    <td>
-                      <p className="rentals-ops__primary">{r.user.firstName} {r.user.lastName}</p>
-                      <p className="rentals-ops__secondary">{r.user.email}</p>
-                    </td>
-                    <td>
-                      <p className="rentals-ops__primary">{r.car.brand} {r.car.model}</p>
-                      <p className="rentals-ops__secondary mono">{r.car.licensePlate}</p>
-                    </td>
-                    <td>{formatDate(r.startDate)} → {formatDate(r.endDate)}</td>
-                    <td className="rentals-ops__total">{formatCLP(r.totalPrice)}</td>
-                    <td><span className={`status ${STATUS_CLASS[r.status]}`}>{STATUS_LABELS[r.status]}</span></td>
-                    <td>
-                      <div className="rentals-ops__actions">
-                        {r.status === 'ACTIVO' && (
-                          <button type="button" className="btn-dark" disabled={busy}
-                            onClick={() => statusMutation.mutate({ id: r.id, status: 'FINALIZADO' })}>
-                            Finalizar
+              {filtered.map((r) => (
+                <tr key={r.id}>
+                  <td className="mono">
+                    <Link to={`/admin/arriendos/${r.id}`} className="rentals-ops__link">#{r.id}</Link>
+                  </td>
+                  <td>
+                    <p className="rentals-ops__primary">
+                      <Link to={`/admin/usuarios/${r.user.id}`} className="rentals-ops__link">
+                        {r.user.firstName} {r.user.lastName}
+                      </Link>
+                    </p>
+                    <p className="rentals-ops__secondary">{r.user.email}</p>
+                  </td>
+                  <td>
+                    <p className="rentals-ops__primary">
+                      <Link to={`/admin/flota/${r.car.id}`} className="rentals-ops__link">
+                        {r.car.brand} {r.car.model}
+                      </Link>
+                    </p>
+                    <p className="rentals-ops__secondary mono">{r.car.licensePlate}</p>
+                  </td>
+                  <td>{formatDate(r.startDate)} → {formatDate(r.endDate)}</td>
+                  <td className="rentals-ops__total">{formatCLP(r.totalPrice)}</td>
+                  <td><span className={`status ${STATUS_CLASS[r.status]}`}>{STATUS_LABELS[r.status]}</span></td>
+                  <td>
+                    <div className="rentals-ops__actions">
+                      <Link to={`/admin/arriendos/${r.id}`} className="rentals-ops__detail-link">
+                        Ver detalles
+                      </Link>
+                      {tab === 'active' ? (
+                        <>
+                          {r.status === 'ACTIVO' && (
+                            <button type="button" className="btn-dark" disabled={busy}
+                              onClick={() => statusMutation.mutate({ id: r.id, status: 'FINALIZADO' })}>
+                              Finalizar
+                            </button>
+                          )}
+                          {(r.status === 'ACTIVO' || r.status === 'PENDIENTE') && (
+                            <button type="button" className="btn-outline-danger" disabled={busy}
+                              onClick={() => statusMutation.mutate({ id: r.id, status: 'CANCELADO' })}>
+                              Cancelar
+                            </button>
+                          )}
+                          <button type="button" className="rentals-ops__delete" disabled={busy}
+                            onClick={() => {
+                              if (confirm(`¿Eliminar el arriendo #${r.id}?`)) deleteMutation.mutate(r.id);
+                            }}>
+                            Eliminar
                           </button>
-                        )}
-                        {(r.status === 'ACTIVO' || r.status === 'PENDIENTE') && (
-                          <button type="button" className="btn-outline-danger" disabled={busy}
-                            onClick={() => statusMutation.mutate({ id: r.id, status: 'CANCELADO' })}>
-                            Cancelar
-                          </button>
-                        )}
-                        <button type="button" className="rentals-ops__delete" disabled={busy}
+                        </>
+                      ) : (
+                        <button type="button" className="rentals-ops__restore" disabled={busy}
                           onClick={() => {
-                            if (confirm(`¿Eliminar el arriendo #${r.id}?`)) deleteMutation.mutate(r.id);
+                            if (confirm(`¿Reactivar el arriendo #${r.id}?`)) restoreMutation.mutate(r.id);
                           }}>
-                          Eliminar
+                          Reactivar
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
