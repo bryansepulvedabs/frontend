@@ -8,22 +8,22 @@
   flex-shrink: 0;
   padding: 28px 16px;
   background: var(--ink);
-  color: var(--paper);
+  color: #D3DDF7;
   display: flex;
   flex-direction: column;
   gap: 32px;
 }
 
 .backoffice__brand { padding: 0 8px; display: flex; flex-direction: column; gap: 2px; }
-.backoffice__brand-name { font: 800 22px var(--font-display); letter-spacing: -0.02em; }
-.backoffice__brand-name span { color: #E0703F; }
-.backoffice__brand-tag { font-size: 12px; color: #A9A396; letter-spacing: 0.08em; text-transform: uppercase; }
+.backoffice__brand-name { font: italic 800 22px var(--font-display); letter-spacing: -0.03em; color: #FFFFFF; }
+.backoffice__brand-name span { color: var(--amber); }
+.backoffice__brand-tag { font-size: 12px; color: #9FB0D6; letter-spacing: 0.08em; text-transform: uppercase; }
 
 .backoffice__nav { display: flex; flex-direction: column; gap: 4px; }
 .backoffice__nav-group {
   padding: 18px 12px 6px;
   font-size: 11px;
-  color: #A9A396;
+  color: #9FB0D6;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -31,19 +31,21 @@
 .backoffice__nav-link {
   display: flex;
   align-items: center;
-  height: 44px;
-  padding: 0 12px;
-  border-radius: 8px;
-  color: #D9D3C6;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 10px;
+  color: #D3DDF7;
   text-decoration: none;
   font-size: 15px;
+  font-weight: 600;
 }
-.backoffice__nav-link.active { background: #33362F; color: #FFFFFF; }
+.backoffice__nav-link:hover { background: #1A2C5E; color: #FFFFFF; }
+.backoffice__nav-link.active { background: var(--accent); color: #FFFFFF; }
 
 .backoffice__user {
   margin-top: auto;
   padding-top: 16px;
-  border-top: 1px solid #3A3D36;
+  border-top: 1px solid #243768;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -51,24 +53,25 @@
 .backoffice__avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: #4A4D44;
+  border-radius: 10px;
+  background: var(--accent);
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 800;
   flex-shrink: 0;
 }
-.backoffice__user-name { margin: 0; font-size: 14px; font-weight: 600; }
-.backoffice__user-role { margin: 0; font-size: 12px; color: #A9A396; }
+.backoffice__user-name { margin: 0; font-size: 14px; font-weight: 700; color: #FFFFFF; }
+.backoffice__user-role { margin: 0; font-size: 12px; color: #9FB0D6; }
 .backoffice__logout {
   border: none;
   background: none;
   padding: 0;
   text-align: left;
-  font: 14px var(--font-body);
-  color: #E7A07F;
+  font: 600 14px var(--font-body);
+  color: #F5C98A;
   cursor: pointer;
 }
 

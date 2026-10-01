@@ -15,15 +15,15 @@
   justify-content: space-between;
 }
 .register__brand { font: 800 24px var(--font-display); letter-spacing: -0.02em; }
-.register__brand span { color: #E0703F; }
+.register__brand span { color: #F5A524; }
 .register__hero-body { display: flex; flex-direction: column; gap: 20px; }
 .register__hero-body h1 {
   margin: 0;
   font: 800 44px/1.05 var(--font-display);
   letter-spacing: -0.03em;
 }
-.register__hero-body p { margin: 0; font-size: 17px; line-height: 1.55; color: #CFC9BC; max-width: 400px; }
-.register__hero-foot { font-size: 13px; color: #A9A396; }
+.register__hero-body p { margin: 0; font-size: 17px; line-height: 1.55; color: #D3DDF7; max-width: 400px; }
+.register__hero-foot { font-size: 13px; color: #9FB0D6; }
 
 .register__form-wrap {
   flex-grow: 1;

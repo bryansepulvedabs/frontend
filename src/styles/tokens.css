@@ -1,29 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&family=IBM+Plex+Mono:wght@500&display=swap');
 
 :root {
-  --ink: #1B1D18;
-  --paper: #F3EFE6;
+  --ink: #0F1E4A;
+  --paper: #F3F6FC;
   --surface: #FFFFFF;
-  --sand: #E9E3D6;
-  --line: #DDD6C8;
-  --line-strong: #B9B1A2;
-  --muted: #5C5F57;
-  --accent: #B4441A;
-  --accent-hover: #933613;
+  --sand: #E6ECFA;
+  --line: #DCE3F2;
+  --line-strong: #C9D3EA;
+  --muted: #4A5A85;
+  --accent: #1E40AF;
+  --accent-hover: #17338A;
+  --amber: #F5A524;
 
-  --ok-bg: #E3EEDF;   --ok-fg: #2A5E33;
-  --off-bg: #E7E5E0;  --off-fg: #4A4C52;
+  --ok-bg: #F5A524;   --ok-fg: #0F1E4A;
+  --off-bg: #DCE3F2;  --off-fg: #0F1E4A;
 
-  --font-display: 'Bricolage Grotesque', sans-serif;
-  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   --radius-sm: 8px;
   --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-lg: 18px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Los enlaces a #catalogo bajan suavemente, salvo que el usuario pida menos movimiento */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 
 body {
   margin: 0;
@@ -39,6 +45,13 @@ a:hover { color: var(--accent-hover); }
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+/* Sobre fondos oscuros el anillo azul no se ve: se usa ámbar */
+.backoffice__sidebar :focus-visible,
+.login__hero :focus-visible,
+.register__hero :focus-visible,
+.client-footer :focus-visible {
+  outline-color: var(--amber);
+}
 
 .btn-primary {
   display: inline-flex;
@@ -50,11 +63,28 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius-md);
   background: var(--accent);
   color: #FFFFFF;
-  font: 600 15px var(--font-body);
+  font: 700 15px var(--font-body);
   text-decoration: none;
   cursor: pointer;
 }
 .btn-primary:hover { background: var(--accent-hover); color: #FFFFFF; }
+
+/* Llamado principal sobre el banner azul (landing) */
+.btn-amber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 800 17px var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-amber:hover { background: #FFB63D; color: var(--ink); }
 
 /* Foto del auto (CarPhoto) */
 .car-photo {
@@ -66,7 +96,7 @@ a:hover { color: var(--accent-hover); }
   justify-content: center;
   overflow: hidden;
   background: var(--sand);
-  color: #8A8373;
+  color: #7C8DBA;
 }
 .car-photo img {
   width: 100%;
@@ -83,7 +113,7 @@ a:hover { color: var(--accent-hover); }
   max-width: calc(100% - 16px);
   padding: 3px 8px;
   border-radius: 4px;
-  background: rgba(27, 29, 24, 0.78);
+  background: rgba(15, 30, 74, 0.82);
   color: #FFFFFF;
   font-size: 11px;
   text-decoration: none;
@@ -104,10 +134,27 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius-sm);
   background: var(--ink);
   color: var(--paper);
-  font: 600 13px var(--font-body);
+  font: 700 13px var(--font-body);
   cursor: pointer;
 }
 .btn-dark:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Se usa en las fichas de auto, usuario y arriendo (no estaba en el CSS que me pasaste) */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 13px var(--font-body);
+  cursor: pointer;
+}
+.btn-outline:hover { border-color: var(--ink); }
+.btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-outline-danger {
   display: inline-flex;
@@ -119,7 +166,7 @@ a:hover { color: var(--accent-hover); }
   border-radius: var(--radius-sm);
   background: var(--surface);
   color: #8E2A20;
-  font: 500 13px var(--font-body);
+  font: 600 13px var(--font-body);
   cursor: pointer;
 }
 .btn-outline-danger:disabled { opacity: 0.5; cursor: not-allowed; }

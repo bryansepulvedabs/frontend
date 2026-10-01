@@ -1,0 +1,327 @@
+/* =====================================================================
+   Landing (banner + catálogo integrado)
+   ===================================================================== */
+
+/* ---------- Banner ---------- */
+.home-hero { background: var(--accent); color: #FFFFFF; }
+.home-hero :focus-visible { outline-color: var(--amber); }
+.home-hero__inner {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 72px 40px 96px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 56px;
+}
+.home-hero__copy { flex: 1 1 520px; display: flex; flex-direction: column; gap: 26px; }
+.home-hero h1 {
+  margin: 0;
+  font: 800 62px/1.03 var(--font-display);
+  letter-spacing: -0.035em;
+}
+.home-hero h1 span { color: var(--amber); }
+.home-hero__lead { margin: 0; max-width: 480px; font-size: 19px; line-height: 1.6; color: #D3DDF7; }
+.home-hero__points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.home-hero__points li { display: inline-flex; align-items: center; gap: 8px; }
+.home-hero__points svg { color: var(--amber); }
+
+/* Tarjeta de reserva */
+.home-book {
+  flex: 1 1 400px;
+  max-width: 460px;
+  padding: 32px;
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 22px;
+  box-shadow: 0 24px 48px rgba(8, 18, 60, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.home-book h2 { margin: 0; font: 800 22px var(--font-display); }
+.home-field { display: flex; flex-direction: column; gap: 6px; }
+.home-field label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.home-field input,
+.home-field select {
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font: 600 16px var(--font-body);
+  color: var(--ink);
+  width: 100%;
+}
+.home-book__hint { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.home-book__clear {
+  align-self: flex-start;
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: 600 14px var(--font-body);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.home-book :focus-visible { outline-color: var(--accent); }
+
+/* ---------- Catálogo ---------- */
+.home-catalog {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 72px 40px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  scroll-margin-top: 8px;
+}
+.home-catalog__intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+.home-catalog__intro h2 { margin: 0; font: 800 38px var(--font-display); letter-spacing: -0.03em; }
+.home-catalog__intro p { margin: 6px 0 0; font-size: 16px; color: var(--muted); }
+
+.home-search { flex: 1 1 340px; max-width: 460px; display: flex; flex-direction: column; gap: 6px; }
+.home-search label { font-size: 13px; font-weight: 700; color: var(--muted); }
+.home-search input {
+  min-height: 50px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  font: 600 16px var(--font-body);
+  color: var(--ink);
+  width: 100%;
+}
+
+.home-catalog__body { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 28px; }
+
+/* Filtros laterales */
+.home-filters {
+  flex: 0 0 260px;
+  width: 260px;
+  max-width: 100%;
+  padding: 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.home-filters__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 800;
+}
+.home-filters__head button {
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  font: 600 14px var(--font-body);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.home-filter { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.home-filter legend { padding: 0; margin-bottom: 8px; font-size: 13px; font-weight: 800; color: var(--muted); }
+.home-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.home-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+.home-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.home-switch input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+
+/* Resultados */
+.home-results { flex: 1 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.home-results__count { margin: 0; font-size: 15px; color: var(--muted); }
+.home-results__count strong { color: var(--ink); }
+.home-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+
+.home-state {
+  margin: 0;
+  padding: 48px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--muted);
+}
+.home-state--error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: #8E2A20;
+  border-color: #D9A69F;
+}
+.home-state--error p { margin: 0; }
+
+@media (max-width: 900px) {
+  .home-hero__inner { padding: 48px 20px 64px; gap: 32px; }
+  .home-hero h1 { font-size: 40px; }
+  .home-catalog { padding: 48px 20px 56px; }
+  .home-catalog__intro h2 { font-size: 30px; }
+  .home-filters { flex-basis: 100%; width: 100%; }
+}
+@media (max-width: 640px) {
+  .home-grid { grid-template-columns: minmax(0, 1fr); }
+  .home-book { padding: 24px; }
+}
+
+/* =====================================================================
+   Clases compartidas (antes vivían en CatalogPage.css).
+   Las usan CarCard y otras páginas (ej. .pills / .pill en UsersPage).
+   ===================================================================== */
+
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 14px var(--font-body);
+  cursor: pointer;
+}
+.pill[aria-pressed='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #FFFFFF;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.badge--ok { background: var(--ok-bg); color: var(--ok-fg); }
+.badge--off { background: var(--off-bg); color: var(--off-fg); }
+
+/* Tarjeta de auto */
+.car-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+/* Auto no reservable: en mantención, o tomado en las fechas elegidas */
+.car-card--off { opacity: 0.6; }
+.car-card--off .car-card__media { filter: grayscale(1); }
+
+.car-card__media {
+  position: relative;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sand);
+  color: #7C8DBA;
+}
+.car-card__plate {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 3px 8px;
+  border: 1px solid var(--ink);
+  border-radius: 4px;
+  background: var(--surface);
+  font: 12px var(--font-mono);
+  color: var(--ink);
+  z-index: 1;
+}
+.car-card__body {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.car-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+.car-card__brand { margin: 0; font-size: 13px; color: var(--muted); }
+.car-card__model {
+  margin: 2px 0 0;
+  font: 800 20px var(--font-display);
+  letter-spacing: -0.01em;
+}
+.car-card__specs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.car-card__specs li {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--paper);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.car-card__foot {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.car-card__rate { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; }
+.car-card__per { margin: 0; font-size: 13px; color: var(--muted); }
+.car-card__unavailable {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+}

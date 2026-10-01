@@ -16,6 +16,8 @@ export interface CarInfo {
   brand: string;
   model: string;
   dailyRate: number;
+  // kilometraje actual del auto
+  mileage?: number | null;
 }
 
 export interface UserInfo {
@@ -33,6 +35,8 @@ export interface RentalResponse {
   endDate: string;
   status: RentalState;
   totalPrice: number;
+  // kilometraje del auto al devolverlo (null mientras no se finaliza)
+  finalMileage?: number | null;
   // true si el arriendo está dado de baja (solo lo devuelve el endpoint de admin)
   deleted?: boolean;
 }

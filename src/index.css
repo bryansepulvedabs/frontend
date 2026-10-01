@@ -1,111 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,800&family=IBM+Plex+Mono:wght@500&display=swap');
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --ink: #0F1E4A;
+  --paper: #F3F6FC;
+  --surface: #FFFFFF;
+  --sand: #E6ECFA;
+  --line: #DCE3F2;
+  --line-strong: #C9D3EA;
+  --muted: #4A5A85;
+  --accent: #1E40AF;
+  --accent-hover: #17338A;
+  --amber: #F5A524;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --ok-bg: #F5A524;   --ok-fg: #0F1E4A;
+  --off-bg: #DCE3F2;  --off-fg: #0F1E4A;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+*, *::before, *::after { box-sizing: border-box; }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+/* Los enlaces a #catalogo bajan suavemente, salvo que el usuario pida menos movimiento */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
 
 body {
   margin: 0;
+  font-family: var(--font-body);
+  background: var(--paper);
+  color: var(--ink);
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Sobre fondos oscuros el anillo azul no se ve: se usa ámbar */
+.backoffice__sidebar :focus-visible,
+.login__hero :focus-visible,
+.register__hero :focus-visible,
+.client-footer :focus-visible {
+  outline-color: var(--amber);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
+.btn-primary {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: #FFFFFF;
+  font: 700 15px var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
 }
+.btn-primary:hover { background: var(--accent-hover); color: #FFFFFF; }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Llamado principal sobre el banner azul (landing) */
+.btn-amber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: var(--amber);
+  color: var(--ink);
+  font: 800 17px var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
 }
+.btn-amber:hover { background: #FFB63D; color: var(--ink); }
+
+/* Foto del auto (CarPhoto) */
+.car-photo {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--sand);
+  color: #7C8DBA;
+}
+.car-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.car-photo--card svg { width: 150px; }
+.car-photo--hero { height: 340px; border-radius: 16px; }
+.car-photo--hero svg { width: 320px; max-width: 80%; }
+.car-photo__credit {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  max-width: calc(100% - 16px);
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(15, 30, 74, 0.82);
+  color: #FFFFFF;
+  font-size: 11px;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.car-photo__credit:hover { color: #FFFFFF; text-decoration: underline; }
+
+/* Botones secundarios usados en el backoffice */
+.btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 13px var(--font-body);
+  cursor: pointer;
+}
+.btn-dark:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Se usa en las fichas de auto, usuario y arriendo (no estaba en el CSS que me pasaste) */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: 700 13px var(--font-body);
+  cursor: pointer;
+}
+.btn-outline:hover { border-color: var(--ink); }
+.btn-outline:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-outline-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: #8E2A20;
+  font: 600 13px var(--font-body);
+  cursor: pointer;
+}
+.btn-outline-danger:disabled { opacity: 0.5; cursor: not-allowed; }

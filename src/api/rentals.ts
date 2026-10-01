@@ -96,6 +96,18 @@ export async function updateRentalDates(
   return parseJsonOrThrow<RentalResponse>(res, 'No se pudieron cambiar las fechas del arriendo');
 }
 
+// PATCH /api/rentals/{id}/finish — requiere ADMIN o EMPLOYEE
+// Devolución del auto: finaliza el arriendo y actualiza el kilometraje global del auto.
+// El kilometraje final no puede ser menor al actual del auto.
+export async function finishRental(id: number, finalMileage: number): Promise<RentalResponse> {
+  const res = await authFetch(`${BASE}/${id}/finish`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ finalMileage }),
+  });
+  return parseJsonOrThrow<RentalResponse>(res, 'No se pudo registrar la devolución');
+}
+
 // DELETE /api/rentals/{id} — requiere ADMIN o EMPLOYEE (borrado lógico: se puede reactivar)
 export async function deleteRental(id: number): Promise<void> {
   const res = await authFetch(`${BASE}/${id}`, { method: 'DELETE' });

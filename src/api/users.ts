@@ -70,3 +70,42 @@ export async function restoreUser(id: number): Promise<User> {
   const res = await authFetch(`${BASE}/${id}/restore`, { method: 'PATCH' });
   return parseJsonOrThrow<User>(res, 'No se pudo reactivar el usuario');
 }
+
+// ---- Cuenta propia ("Mi perfil"): cualquier usuario con sesión ----
+
+// Lo que el usuario puede cambiar de su propia cuenta. Sin RUT ni rol a propósito.
+export interface ProfileUpdate {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  country: string;
+}
+
+// GET /api/users/me
+export async function getMe(): Promise<User> {
+  const res = await authFetch(`${BASE}/me`);
+  return parseJsonOrThrow<User>(res, 'tu perfil');
+}
+
+// PUT /api/users/me
+export async function updateMe(dto: ProfileUpdate): Promise<User> {
+  const res = await authFetch(`${BASE}/me`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(dto),
+  });
+  return parseJsonOrThrow<User>(res, 'No se pudo guardar tu perfil');
+}
+
+// PUT /api/users/me/password
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  const res = await authFetch(`${BASE}/me/password`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentPassword, newPassword }),
+  });
+  await parseJsonOrThrow<void>(res, 'No se pudo cambiar la contraseña');
+}

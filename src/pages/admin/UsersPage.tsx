@@ -52,10 +52,18 @@ export default function UsersPage() {
 
   const query = tab === 'active' ? activeQuery : deletedQuery;
   const users = query.data ?? [];
-  const filtered = users.filter((u) => filter === 'TODOS' || u.role === filter);
 
   const actionError =
     deleteMutation.error?.message ?? restoreMutation.error?.message ?? roleMutation.error?.message ?? null;
+
+  const [search, setSearch] = useState('');
+
+  const term = search.trim().toLowerCase();
+  const filtered = users.filter(
+    (u) =>
+      (filter === 'TODOS' || u.role === filter) &&
+      (!term || `${u.firstName} ${u.lastName} ${u.email} ${u.rut}`.toLowerCase().includes(term)),
+  );
 
   return (
     <section className="users">
@@ -81,6 +89,12 @@ export default function UsersPage() {
         >
           Eliminados
         </button>
+      </div>
+
+      <div className="users__search">
+        <label htmlFor="users-search">Buscar</label>
+        <input id="users-search" type="search" placeholder="Nombre, correo o RUT"
+          value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       <div className="pills" role="group" aria-label="Filtrar por rol">

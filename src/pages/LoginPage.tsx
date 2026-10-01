@@ -42,69 +42,89 @@ export default function LoginPage() {
 
   return (
     <div className="login">
-      <section className="login__hero">
-        <div className="login__brand">
-          rent<span>·</span>a<span>·</span>car
+      <section className="login__band">
+        {/* Decoración: líneas de velocidad del logo y silueta del auto */}
+        <div className="login__lines" aria-hidden="true">
+          <span />
+          <span />
+          <span />
         </div>
-        <div className="login__hero-body">
-          <svg width="220" height="96" viewBox="0 0 120 56" fill="none" stroke="#E0703F"
-            strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M8 40V31c0-4 3-7 9-8l19-3 13-10c2-1 5-2 8-2h22c4 0 7 1 10 4l10 8 9 2c5 1 8 4 8 8v10" />
-            <path d="M8 40h12M44 40h34M102 40h10" />
-            <circle cx="32" cy="40" r="10" />
-            <circle cx="90" cy="40" r="10" />
-            <path d="M42 20l10-9h14v9zM72 20v-9h12l10 9z" />
-          </svg>
-          <h1>Arrienda el auto justo, sin vueltas.</h1>
+        <svg className="login__bg-car" viewBox="0 0 120 56" fill="none" stroke="currentColor"
+          strokeWidth="0.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M8 40V31c0-4 3-7 9-8l19-3 13-10c2-1 5-2 8-2h22c4 0 7 1 10 4l10 8 9 2c5 1 8 4 8 8v10" />
+          <path d="M8 40h12M44 40h34M102 40h10" />
+          <circle cx="32" cy="40" r="10" />
+          <circle cx="90" cy="40" r="10" />
+          <path d="M42 20l10-9h14v9zM72 20v-9h12l10 9z" />
+        </svg>
+
+        <header className="login__header">
+          <Link to="/" className="login__brand">
+            <svg width="32" height="23" viewBox="0 0 34 24" fill="none" stroke="currentColor"
+              strokeWidth="3.5" strokeLinecap="round" aria-hidden="true">
+              <path d="M8 3h22M3 12h27M6 21h22" />
+            </svg>
+            <span>Rent<span className="login__brand-a">A</span>Car</span>
+          </Link>
+          <Link to="/" className="login__back">← Volver al catálogo</Link>
+        </header>
+
+        <div className="login__intro">
+          <h1>
+            Arrienda el auto justo, <span>sin vueltas.</span>
+          </h1>
           <p>Revisa la flota disponible, elige tus fechas y conoce el total antes de confirmar.</p>
         </div>
-        <div className="login__hero-foot">Proyecto rent-a-car · microservicios Spring Boot</div>
       </section>
 
-      <section className="login__form-wrap">
-        <form className="login__form" onSubmit={submit}>
-          <div>
-            <h2>Iniciar sesión</h2>
-            <p>Ingresa con tu cuenta para continuar.</p>
-          </div>
+      <main className="login__main">
+        <div className="login__card">
+          <nav className="login__tabs" aria-label="Acceso">
+            <span className="login__tab" aria-current="page">Ingresar</span>
+            <Link to="/registro" className="login__tab">Crear cuenta</Link>
+          </nav>
 
-          <div className="field">
-            <label htmlFor="email">Correo electrónico</label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+          <form className="login__form" onSubmit={submit}>
+            <div>
+              <h2>Iniciar sesión</h2>
+              <p>Ingresa con tu cuenta para continuar.</p>
+            </div>
 
-          <div className="field">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+            <div className="field">
+              <label htmlFor="email">Correo electrónico</label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="username"
+                placeholder="tu@correo.cl"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
 
-          {mutation.isError && (
-            <p className="login__error" role="alert">{mutation.error.message}</p>
-          )}
+            <div className="field">
+              <label htmlFor="password">Contraseña</label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
 
-          <button type="submit" className="btn-primary login__submit" disabled={mutation.isPending}>
-            {mutation.isPending ? 'Ingresando…' : 'Ingresar'}
-          </button>
+            {mutation.isError && (
+              <p className="login__error" role="alert">{mutation.error.message}</p>
+            )}
 
-          <p className="login__foot">
-            ¿No tienes cuenta? <Link to="/registro">Crea una</Link>
-          </p>
-        </form>
-      </section>
+            <button type="submit" className="btn-amber login__submit" disabled={mutation.isPending}>
+              {mutation.isPending ? 'Ingresando…' : 'Ingresar'}
+            </button>
+          </form>
+        </div>
+      </main>
     </div>
   );
 }

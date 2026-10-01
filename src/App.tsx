@@ -2,10 +2,11 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ClientLayout from './layouts/ClientLayout';
 import BackofficeLayout from './layouts/BackofficeLayout';
 import ProtectedRoute from './components/ProtectedRoute';
-import CatalogPage from './pages/CatalogPage';
+import HomePage from './pages/HomePage';
 import CarDetailPage from './pages/CarDetailPage';
 import MyRentalsPage from './pages/MyRentalsPage';
 import LoginPage from './pages/LoginPage';
+import MyProfilePage from './pages/MyProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import FleetPage from './pages/admin/FleetPage';
 import CarDetailAdminPage from './pages/admin/CarDetailAdminPage';
@@ -19,13 +20,21 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<ClientLayout />}>
-          <Route path="/" element={<CatalogPage />} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/autos/:id" element={<CarDetailPage />} />
           <Route
             path="/mis-arriendos"
             element={
               <ProtectedRoute allow={['CLIENT', 'ADMIN', 'EMPLOYEE']}>
                 <MyRentalsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/mi-perfil"
+            element={
+              <ProtectedRoute allow={['CLIENT', 'ADMIN', 'EMPLOYEE']}>
+                <MyProfilePage />
               </ProtectedRoute>
             }
           />

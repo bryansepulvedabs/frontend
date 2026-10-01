@@ -20,12 +20,10 @@ export default function BackofficeLayout() {
   return (
     <div className="backoffice">
       <aside className="backoffice__sidebar">
-        <div className="backoffice__brand">
-          <span className="backoffice__brand-name">
-            rent<span>·</span>a<span>·</span>car
-          </span>
-          <span className="backoffice__brand-tag">Backoffice</span>
-        </div>
+          <div className="backoffice__brand">
+            <span className="backoffice__brand-name">Rent<span>A</span>Car</span>
+            <span className="backoffice__brand-tag">Admin</span>
+          </div>
 
         <nav className="backoffice__nav">
           <span className="backoffice__nav-group">Operación</span>

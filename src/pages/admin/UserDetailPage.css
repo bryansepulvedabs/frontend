@@ -22,7 +22,7 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #E0D6C3;
+  background: #E6ECFA;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,7 +100,7 @@
 }
 .user-detail__table td {
   padding: 14px 16px 14px 0;
-  border-bottom: 1px solid #EDE8DE;
+  border-bottom: 1px solid #E6ECFA;
   vertical-align: middle;
 }
 .user-detail__table th:last-child,
@@ -137,8 +137,22 @@
   gap: 16px;
   flex-wrap: wrap;
   padding: 16px 20px;
-  background: #F5EFE2;
+  background: #EEF3FF;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
 }
 .user-detail__banner p { margin: 0; font-size: 14px; color: var(--ink); }
+
+.user-detail__header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.user-detail__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.user-detail__form .field { display: flex; flex-direction: column; gap: 6px; }
+.user-detail__form label { font-size: 13px; color: var(--muted); }
+.user-detail__form-wide { grid-column: 1 / -1; }
+.user-detail__form-actions { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .user-detail__form { grid-template-columns: minmax(0, 1fr); }
+}

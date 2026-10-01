@@ -84,7 +84,7 @@
 }
 .car-admin__table td {
   padding: 14px 16px 14px 0;
-  border-bottom: 1px solid #EDE8DE;
+  border-bottom: 1px solid #E6ECFA;
   vertical-align: middle;
 }
 .car-admin__table tbody tr:last-child td { border-bottom: none; }
@@ -104,8 +104,22 @@
   gap: 16px;
   flex-wrap: wrap;
   padding: 16px 20px;
-  background: #F5EFE2;
+  background: #EEF3FF;
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
 }
 .car-admin__banner p { margin: 0; font-size: 14px; color: var(--ink); }
+
+.car-admin__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.car-admin__form .field { display: flex; flex-direction: column; gap: 6px; }
+.car-admin__form label { font-size: 13px; color: var(--muted); }
+.car-admin__form-note { grid-column: 1 / -1; margin: 0; font-size: 13px; color: var(--muted); }
+.car-admin__form-wide { grid-column: 1 / -1; }
+.car-admin__form-actions { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 600px) {
+  .car-admin__form { grid-template-columns: minmax(0, 1fr); }
+}

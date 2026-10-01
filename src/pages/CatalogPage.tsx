@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getCars } from '../api/cars';
 import { getOccupiedCarIds } from '../api/rentals';
@@ -11,6 +12,15 @@ import './CatalogPage.css';
 type CategoryFilter = Category | 'TODAS';
 type FuelFilter = Fuel | 'TODOS';
 
+function Tick() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
 export default function CatalogPage() {
   const {
     data: cars = [],
@@ -22,11 +32,21 @@ export default function CatalogPage() {
   const [category, setCategory] = useState<CategoryFilter>('TODAS');
   const [fuel, setFuel] = useState<FuelFilter>('TODOS');
   const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [search, setSearch] = useState('');
 
   // Fechas opcionales: sin fechas el catálogo muestra todo lo operativo, igual que antes.
   const today = todayISO();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  // Al llegar desde otra página con "/#catalogo" (menú del encabezado), baja al catálogo.
+  // Se escucha location.key para que también funcione si ya estabas en la landing.
+  const location = useLocation();
+  useEffect(() => {
+    if (location.hash === '#catalogo') {
+      document.getElementById('catalogo')?.scrollIntoView();
+    }
+  }, [location.key, location.hash]);
 
   const bothDates = !!startDate && !!endDate;
   const datesValid = bothDates && startDate >= today && daysBetween(startDate, endDate) >= 1;
@@ -53,11 +73,14 @@ export default function CatalogPage() {
     return null;
   };
 
+  const term = search.trim().toLowerCase();
+
   const filtered = useMemo(() => {
     const matching = cars.filter(
       (c) =>
         (category === 'TODAS' || c.category === category) &&
         (fuel === 'TODOS' || c.fuel === fuel) &&
+        (!term || `${c.brand} ${c.model}`.toLowerCase().includes(term)) &&
         (!onlyAvailable || reasonFor(c.id, c.availability) === null),
     );
     // Los no disponibles se muestran igual, pero al final: el usuario ve que el auto
@@ -67,7 +90,7 @@ export default function CatalogPage() {
         Number(reasonFor(a.id, a.availability) !== null) -
         Number(reasonFor(b.id, b.availability) !== null),
     );
-  }, [cars, category, fuel, onlyAvailable, occupied, datesValid]);
+  }, [cars, category, fuel, term, onlyAvailable, occupied, datesValid]);
 
   const availableCount = filtered.filter((c) => reasonFor(c.id, c.availability) === null).length;
 
@@ -90,121 +113,178 @@ export default function CatalogPage() {
   };
 
   return (
-    <section className="catalog">
-      <div className="catalog__intro">
-        <div>
-          <h1>Elige tu auto</h1>
-          <p>Tarifas diarias en pesos chilenos. El total se calcula según los días del arriendo.</p>
+    <>
+      {/* ---------- Banner con selección de fechas ---------- */}
+      <section className="hero">
+        <div className="hero__inner">
+          <div className="hero__copy">
+            <h1>
+              Arrienda el auto justo, <span>sin vueltas.</span>
+            </h1>
+            <p>Revisa la flota disponible, elige tus fechas y conoce el total antes de confirmar.</p>
+            <ul className="hero__ticks">
+              <li><Tick />Total claro</li>
+              <li><Tick />Disponibilidad real</li>
+              <li><Tick />Reserva en minutos</li>
+            </ul>
+          </div>
+
+          <div className="hero__card">
+            <h2>Reserva tu auto</h2>
+
+            <div className="field">
+              <label htmlFor="catalog-start">Retiro</label>
+              <input
+                id="catalog-start"
+                type="date"
+                min={today}
+                value={startDate}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setStartDate(next);
+                  // Si la devolución quedó antes del nuevo retiro, se corre un día después
+                  if (next && endDate && daysBetween(next, endDate) < 1) setEndDate(addDays(next, 1));
+                }}
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="catalog-end">Devolución</label>
+              <input
+                id="catalog-end"
+                type="date"
+                min={startDate ? addDays(startDate, 1) : addDays(today, 1)}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="hero-category">Categoría</label>
+              <select
+                id="hero-category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as CategoryFilter)}
+              >
+                <option value="TODAS">Todas</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+                ))}
+              </select>
+            </div>
+
+            <p className="hero__hint" aria-live="polite">{datesHint()}</p>
+
+            {(startDate || endDate) && (
+              <button type="button" className="hero__clear" onClick={clearDates}>
+                Limpiar fechas
+              </button>
+            )}
+
+            <a href="#catalogo" className="btn-amber">Ver autos disponibles</a>
+          </div>
         </div>
-        {!loading && !error && (
-          <p className="catalog__count">
-            {filtered.length} {filtered.length === 1 ? 'auto' : 'autos'}
-          </p>
-        )}
-      </div>
+      </section>
 
-      <div className="catalog__dates">
-        <div className="field">
-          <label htmlFor="catalog-start">Retiro</label>
-          <input
-            id="catalog-start"
-            type="date"
-            min={today}
-            value={startDate}
-            onChange={(e) => {
-              const next = e.target.value;
-              setStartDate(next);
-              // Si la devolución quedó antes del nuevo retiro, se corre un día después
-              if (next && endDate && daysBetween(next, endDate) < 1) setEndDate(addDays(next, 1));
-            }}
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="catalog-end">Devolución</label>
-          <input
-            id="catalog-end"
-            type="date"
-            min={startDate ? addDays(startDate, 1) : addDays(today, 1)}
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-          />
-        </div>
-        {(startDate || endDate) && (
-          <button type="button" className="catalog__clear-dates" onClick={clearDates}>
-            Limpiar fechas
-          </button>
-        )}
-        <p className="catalog__dates-hint" aria-live="polite">{datesHint()}</p>
-      </div>
-
-      <div className="catalog__filters">
-        <div className="pills" role="group" aria-label="Filtrar por categoría">
-          <button
-            type="button"
-            className="pill"
-            aria-pressed={category === 'TODAS'}
-            onClick={() => setCategory('TODAS')}
-          >
-            Todas
-          </button>
-          {categories.map((c) => (
-            <button
-              key={c}
-              type="button"
-              className="pill"
-              aria-pressed={category === c}
-              onClick={() => setCategory(c)}
-            >
-              {CATEGORY_LABELS[c]}
-            </button>
-          ))}
-        </div>
-
-        <div className="catalog__side-filters">
-          <label htmlFor="fuel">Combustible</label>
-          <select id="fuel" value={fuel} onChange={(e) => setFuel(e.target.value as FuelFilter)}>
-            <option value="TODOS">Todos</option>
-            {fuels.map((f) => (
-              <option key={f} value={f}>{FUEL_LABELS[f]}</option>
-            ))}
-          </select>
-          <button
-            type="button"
-            className="pill"
-            aria-pressed={onlyAvailable}
-            onClick={() => setOnlyAvailable((v) => !v)}
-          >
-            Solo disponibles
-          </button>
-        </div>
-      </div>
-
-      {loading && <p className="catalog__state">Cargando autos…</p>}
-
-      {error && (
-        <div className="catalog__state catalog__state--error" role="alert">
-          <p>{error.message}. Revisa que el api-gateway y car-service estén levantados.</p>
-          <button type="button" className="btn-primary" onClick={() => refetch()}>Reintentar</button>
-        </div>
-      )}
-
-      {!loading && !error && filtered.length === 0 && (
-        <p className="catalog__state">No hay autos que coincidan con estos filtros.</p>
-      )}
-
-      {!loading && !error && filtered.length > 0 && (
-        <div className="catalog__grid">
-          {filtered.map((car) => (
-            <CarCard
-              key={car.id}
-              car={car}
-              unavailableReason={reasonFor(car.id, car.availability)}
-              startDate={datesValid ? startDate : undefined}
-              endDate={datesValid ? endDate : undefined}
+      {/* ---------- Catálogo ---------- */}
+      <section className="catalog" id="catalogo">
+        <div className="catalog__head">
+          <div>
+            <h2>Catálogo de autos</h2>
+            <p>Tarifas diarias en pesos chilenos. El total se calcula según los días del arriendo.</p>
+          </div>
+          <div className="catalog__search">
+            <label htmlFor="catalog-search">Buscar</label>
+            <input
+              id="catalog-search"
+              type="search"
+              placeholder="Marca o modelo"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
-          ))}
+          </div>
         </div>
-      )}
-    </section>
+
+        <div className="catalog__layout">
+          <aside className="catalog__filters" aria-label="Filtros del catálogo">
+            <h3>Filtros</h3>
+
+            <fieldset className="filters__group">
+              <legend>Categoría</legend>
+              <label className="filters__option">
+                <input type="radio" name="category" checked={category === 'TODAS'}
+                  onChange={() => setCategory('TODAS')} />
+                Todas
+              </label>
+              {categories.map((c) => (
+                <label key={c} className="filters__option">
+                  <input type="radio" name="category" checked={category === c}
+                    onChange={() => setCategory(c)} />
+                  {CATEGORY_LABELS[c]}
+                </label>
+              ))}
+            </fieldset>
+
+            <fieldset className="filters__group">
+              <legend>Combustible</legend>
+              <label className="filters__option">
+                <input type="radio" name="fuel" checked={fuel === 'TODOS'}
+                  onChange={() => setFuel('TODOS')} />
+                Todos
+              </label>
+              {fuels.map((f) => (
+                <label key={f} className="filters__option">
+                  <input type="radio" name="fuel" checked={fuel === f}
+                    onChange={() => setFuel(f)} />
+                  {FUEL_LABELS[f]}
+                </label>
+              ))}
+            </fieldset>
+
+            <label className="catalog__toggle">
+              Solo disponibles
+              <input type="checkbox" checked={onlyAvailable}
+                onChange={(e) => setOnlyAvailable(e.target.checked)} />
+            </label>
+          </aside>
+
+          <div className="catalog__results">
+            {!loading && !error && (
+              <p className="catalog__count">
+                <strong>{filtered.length} {filtered.length === 1 ? 'auto' : 'autos'}</strong>{' '}
+                {filtered.length === 1 ? 'encontrado' : 'encontrados'}
+              </p>
+            )}
+
+            {loading && <p className="catalog__state">Cargando autos…</p>}
+
+            {error && (
+              <div className="catalog__state catalog__state--error" role="alert">
+                <p>{error.message}. Revisa que el api-gateway y car-service estén levantados.</p>
+                <button type="button" className="btn-primary" onClick={() => refetch()}>Reintentar</button>
+              </div>
+            )}
+
+            {!loading && !error && filtered.length === 0 && (
+              <p className="catalog__state">No hay autos que coincidan con estos filtros.</p>
+            )}
+
+            {!loading && !error && filtered.length > 0 && (
+              <div className="catalog__grid">
+                {filtered.map((car) => (
+                  <CarCard
+                    key={car.id}
+                    car={car}
+                    unavailableReason={reasonFor(car.id, car.availability)}
+                    startDate={datesValid ? startDate : undefined}
+                    endDate={datesValid ? endDate : undefined}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

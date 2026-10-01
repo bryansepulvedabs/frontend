@@ -198,10 +198,9 @@ export default function RentalsOpsPage() {
                       {tab === 'active' ? (
                         <>
                           {r.status === 'ACTIVO' && (
-                            <button type="button" className="btn-dark" disabled={busy}
-                              onClick={() => statusMutation.mutate({ id: r.id, status: 'FINALIZADO' })}>
-                              Finalizar
-                            </button>
+                            <Link to={`/admin/arriendos/${r.id}?devolucion=1`} className="rentals-ops__return-link">
+                              Registrar devolución
+                            </Link>
                           )}
                           {(r.status === 'ACTIVO' || r.status === 'PENDIENTE') && (
                             <button type="button" className="btn-outline-danger" disabled={busy}

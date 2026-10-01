@@ -27,29 +27,27 @@ export default function CarCard({ car, unavailableReason = null, startDate, endD
       <div className="car-card__media">
         <CarPhoto car={car} size="card" />
         <span className="car-card__plate">{car.licensePlate}</span>
+        {unavailableReason === 'maintenance' ? (
+          <span className="badge badge--off car-card__status">En mantención</span>
+        ) : unavailableReason === 'booked' ? (
+          <span className="badge badge--off car-card__status">Arrendado</span>
+        ) : (
+          <span className="badge badge--ok car-card__status">Disponible</span>
+        )}
       </div>
 
       <div className="car-card__body">
         <div className="car-card__head">
-          <div>
-            <p className="car-card__brand">{car.brand}</p>
-            <h3 className="car-card__model">{car.model}</h3>
-          </div>
-          {unavailableReason === 'maintenance' ? (
-            <span className="badge badge--off">En mantención</span>
-          ) : unavailableReason === 'booked' ? (
-            <span className="badge badge--off">Arrendado</span>
-          ) : (
-            <span className="badge badge--ok">Disponible</span>
-          )}
+          <h3 className="car-card__model">{car.brand} {car.model}</h3>
+          <span className="car-card__category">{CATEGORY_LABELS[car.category]}</span>
         </div>
 
-        <ul className="car-card__specs">
-          <li>{CATEGORY_LABELS[car.category]}</li>
-          <li>{FUEL_LABELS[car.fuel]}</li>
-          <li>{car.year}</li>
-          <li>{car.seats} asientos</li>
-        </ul>
+        <dl className="car-card__specs">
+          <div><dt>Año</dt><dd>{car.year}</dd></div>
+          <div><dt>Asientos</dt><dd>{car.seats}</dd></div>
+          <div><dt>Color</dt><dd>{car.color || '—'}</dd></div>
+          <div><dt>Comb.</dt><dd>{FUEL_LABELS[car.fuel]}</dd></div>
+        </dl>
 
         <div className="car-card__foot">
           <div>

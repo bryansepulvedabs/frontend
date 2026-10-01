@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import type { FormEvent } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   deleteRental,
+  finishRental,
   getRentalAdmin,
   getRentalById,
   restoreRental,
@@ -29,9 +31,15 @@ export default function RentalDetailPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
 
+  // El botón "Registrar devolución" del listado llega aquí con ?devolucion=1
+  const [searchParams] = useSearchParams();
+  const wantsReturn = searchParams.get('devolucion') === '1';
+  const returnRef = useRef<HTMLFormElement>(null);
+
   const [editing, setEditing] = useState(false);
   const [editStart, setEditStart] = useState('');
   const [editEnd, setEditEnd] = useState('');
+  const [finalMileage, setFinalMileage] = useState('');
 
   // Esta ficha la pueden abrir ADMIN y EMPLOYEE. Solo el ADMIN ve eliminados, así que
   // el endpoint depende del rol: el de admin devuelve también los dados de baja, el
@@ -65,6 +73,18 @@ export default function RentalDetailPage() {
     },
   });
 
+  // Devolución: finaliza el arriendo y el servidor actualiza el kilometraje global del auto
+  const finishMutation = useMutation({
+    mutationFn: (km: number) => finishRental(rentalId, km),
+    onSuccess: () => {
+      invalidate();
+      // el kilometraje del auto cambió: se refrescan el catálogo y su ficha administrativa
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+      queryClient.invalidateQueries({ queryKey: ['car-admin'] });
+      setFinalMileage('');
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: () => deleteRental(rentalId),
     onSuccess: invalidate,
@@ -74,6 +94,14 @@ export default function RentalDetailPage() {
     mutationFn: () => restoreRental(rentalId),
     onSuccess: invalidate,
   });
+
+  // Si se llegó con ?devolucion=1 y el arriendo está activo, baja a la tarjeta y enfoca el campo.
+  useEffect(() => {
+    if (wantsReturn && rental?.status === 'ACTIVO') {
+      returnRef.current?.scrollIntoView({ block: 'center' });
+      document.getElementById('final-mileage')?.focus();
+    }
+  }, [wantsReturn, rental?.status]);
 
   if (!Number.isFinite(rentalId)) {
     return <p className="rental-admin__state">La dirección no corresponde a un arriendo válido.</p>;
@@ -104,7 +132,11 @@ export default function RentalDetailPage() {
   const isDeleted = rental.deleted === true;
   const isOpen = rental.status === 'PENDIENTE' || rental.status === 'ACTIVO';
   const busy =
-    statusMutation.isPending || datesMutation.isPending || deleteMutation.isPending || restoreMutation.isPending;
+    statusMutation.isPending ||
+    datesMutation.isPending ||
+    finishMutation.isPending ||
+    deleteMutation.isPending ||
+    restoreMutation.isPending;
   const days = daysBetween(rental.startDate, rental.endDate);
   const actionError =
     statusMutation.error?.message ??
@@ -140,6 +172,32 @@ export default function RentalDetailPage() {
   const dailyRate = days > 0 ? rental.totalPrice / days : 0;
   const previewTotal = editDays > 0 ? dailyRate * editDays : null;
 
+  // ---- Devolución ----
+  const currentMileage = rental.car.mileage ?? null;
+  const km = finalMileage.trim() === '' ? null : Number(finalMileage);
+  const kmError =
+    km === null
+      ? null
+      : !Number.isInteger(km) || km < 0
+        ? 'Ingresa un kilometraje válido (número entero).'
+        : currentMileage !== null && km < currentMileage
+          ? `No puede ser menor al kilometraje actual del auto (${currentMileage.toLocaleString('es-CL')} km).`
+          : null;
+  const kmDiff = km !== null && currentMileage !== null && !kmError ? km - currentMileage : null;
+
+  const focusReturn = () => {
+    returnRef.current?.scrollIntoView({ block: 'center' });
+    document.getElementById('final-mileage')?.focus();
+  };
+
+  const submitReturn = (e: FormEvent) => {
+    e.preventDefault();
+    if (km === null || kmError) return;
+    if (confirm(`¿Registrar la devolución con ${km.toLocaleString('es-CL')} km? El arriendo quedará finalizado.`)) {
+      finishMutation.mutate(km);
+    }
+  };
+
   return (
     <section className="rental-admin">
       <Link to="/admin/arriendos" className="rental-admin__back">← Volver a arriendos</Link>
@@ -162,10 +220,10 @@ export default function RentalDetailPage() {
                 Marcar como activo
               </button>
             )}
+            {/* Finalizar ya no cambia el estado directo: la devolución exige el kilometraje final */}
             {rental.status === 'ACTIVO' && (
-              <button type="button" className="btn-dark" disabled={busy}
-                onClick={() => statusMutation.mutate('FINALIZADO')}>
-                Finalizar
+              <button type="button" className="btn-dark" disabled={busy} onClick={focusReturn}>
+                Registrar devolución
               </button>
             )}
             {isOpen && (
@@ -234,6 +292,9 @@ export default function RentalDetailPage() {
             </div>
             <div><dt>Patente</dt><dd className="mono">{rental.car.licensePlate}</dd></div>
             <div><dt>Tarifa diaria</dt><dd>{formatCLP(rental.car.dailyRate)}</dd></div>
+            {currentMileage !== null && (
+              <div><dt>Kilometraje</dt><dd>{currentMileage.toLocaleString('es-CL')} km</dd></div>
+            )}
           </dl>
         </div>
 
@@ -253,6 +314,12 @@ export default function RentalDetailPage() {
               <div><dt>Devolución</dt><dd>{formatDate(rental.endDate)}</dd></div>
               <div><dt>Duración</dt><dd>{days} {days === 1 ? 'día' : 'días'}</dd></div>
               <div><dt>Total</dt><dd className="rental-admin__total">{formatCLP(rental.totalPrice)}</dd></div>
+              {rental.finalMileage != null && (
+                <div>
+                  <dt>Kilometraje final</dt>
+                  <dd>{rental.finalMileage.toLocaleString('es-CL')} km</dd>
+                </div>
+              )}
             </dl>
           )}
 
@@ -318,6 +385,69 @@ export default function RentalDetailPage() {
           )}
         </div>
       </div>
+
+      {/* ---------- Devolución: solo con el arriendo activo ---------- */}
+      {rental.status === 'ACTIVO' && !isDeleted && (
+        <form
+          ref={returnRef}
+          id="devolucion"
+          className="rental-admin__card rental-admin__return"
+          onSubmit={submitReturn}
+        >
+          <h2>Registrar devolución</h2>
+          <p className="rental-admin__edit-note">
+            Indica el kilometraje que marca el auto al recibirlo. El arriendo pasa a Finalizado,
+            el auto queda libre y su kilometraje se actualiza.
+          </p>
+
+          <dl className="rental-admin__data">
+            <div>
+              <dt>Kilometraje actual del auto</dt>
+              <dd>{currentMileage !== null ? `${currentMileage.toLocaleString('es-CL')} km` : '—'}</dd>
+            </div>
+          </dl>
+
+          <div className="field">
+            <label htmlFor="final-mileage">Kilometraje final (km)</label>
+            <input
+              id="final-mileage"
+              type="number"
+              inputMode="numeric"
+              step={1}
+              min={currentMileage ?? 0}
+              placeholder={currentMileage !== null ? String(currentMileage) : '0'}
+              value={finalMileage}
+              onChange={(e) => {
+                setFinalMileage(e.target.value);
+                finishMutation.reset();
+              }}
+            />
+          </div>
+
+          {kmDiff !== null && (
+            <p className="rental-admin__km-diff">
+              Kilómetros recorridos: {kmDiff.toLocaleString('es-CL')} km
+            </p>
+          )}
+
+          {kmError && <p className="rental-admin__state rental-admin__state--error" role="alert">{kmError}</p>}
+          {finishMutation.isError && (
+            <p className="rental-admin__state rental-admin__state--error" role="alert">
+              {finishMutation.error.message}
+            </p>
+          )}
+
+          <div className="rental-admin__edit-actions">
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={km === null || !!kmError || busy}
+            >
+              {finishMutation.isPending ? 'Registrando…' : 'Confirmar devolución'}
+            </button>
+          </div>
+        </form>
+      )}
     </section>
   );
 }

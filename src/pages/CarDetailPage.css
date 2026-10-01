@@ -22,7 +22,7 @@
   height: 300px;
   border-radius: 16px;
   background: var(--sand);
-  color: #8A8373;
+  color: #7C8DBA;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -114,7 +114,7 @@
   flex-direction: column;
   gap: 10px;
 }
-.booking__breakdown .row { display: flex; justify-content: space-between; font-size: 15px; color: #3F423B; }
+.booking__breakdown .row { display: flex; justify-content: space-between; font-size: 15px; color: #33426E; }
 .booking__breakdown .row--total { align-items: baseline; font-weight: 600; color: var(--ink); }
 .booking__total { font: 800 30px var(--font-display); letter-spacing: -0.02em; }
 
@@ -127,7 +127,7 @@
   font-size: 14px;
 }
 .booking__submit { min-height: 52px; font-size: 16px; }
-.booking__submit:disabled { background: #E7E5E0; color: var(--muted); cursor: not-allowed; }
+.booking__submit:disabled { background: #E6ECFA; color: var(--muted); cursor: not-allowed; }
 .booking__note { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
 
 .booking__summary { margin: 0; display: flex; flex-direction: column; gap: 12px; }

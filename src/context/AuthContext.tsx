@@ -9,6 +9,8 @@ interface AuthContextValue {
   user: AuthUser | null;
   login: (user: AuthUser) => void;
   logout: () => void;
+  // Actualiza datos de la sesión (ej. el nombre) sin tocar el token ni volver a iniciar sesión
+  updateUser: (patch: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -44,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearToken();
         setUser(null);
       },
+      updateUser: (patch) => setUser((prev) => (prev ? { ...prev, ...patch } : prev)),
     }),
     [user],
   );

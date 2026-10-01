@@ -67,7 +67,7 @@ export default function RegisterPage() {
     <div className="register">
       <section className="register__hero">
         <div className="register__brand">
-          rent<span>·</span>a<span>·</span>car
+          Rent<span>A</span>Car
         </div>
         <div className="register__hero-body">
           <h1>Crea tu cuenta y reserva en minutos.</h1>
